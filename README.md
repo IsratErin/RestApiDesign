@@ -1,4 +1,4 @@
-# REST API Design 
+# REST API Design
 
 # Swedish Pastries Bakery Management System 
 
@@ -79,4 +79,3 @@ To run this project, follow these steps:
 
     This will start the server using `nodemon`, which automatically restarts the server when file changes are detected. The API will be accessible at `http://localhost:3000`.
 
-# RestApiDesign
