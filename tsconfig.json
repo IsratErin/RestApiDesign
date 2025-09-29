@@ -5,8 +5,7 @@
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "outDir": "dist",
-    "rootDir": "."
-  }
+    "strict": true
+  },
+  "include": ["server.ts", "**/*.ts"]
 }
