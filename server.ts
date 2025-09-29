@@ -52,10 +52,10 @@ const pastrySchema = z.array(
 app.get("/pastries", (req, res) => {
   try {
     const validatedPastries = pastrySchema.safeParse(pastries);
-  if(!validatedPastries){
-    return res.status(404).json({
+  if(!validatedPastries.success){
+    return res.status(400).json({
       error: "The data is not in right format",
-     // details: validatedPastries.error,
+      details: validatedPastries.error,
     })
   }
   res.json({
@@ -68,12 +68,25 @@ app.get("/pastries", (req, res) => {
   }
 });
 
+const pastryInputSchema = z.object({
+  flavour: z.string(),
+  name: z.string(),
+  price: z.number(),
+});
+
 app.post("/pastries",(req,res)=>{
+  const validatedPastry = pastryInputSchema.safeParse(req.body);
+  if(!validatedPastry.success){
+    return res.status(400).json({
+      error: "Invalid pastry data",
+      details: validatedPastry.error,
+    });
+  }
   const newaddedPastry ={
     id: pastries.length + 1,
-    flavour: req.body.flavour,
-    name: req.body.name,
-    price: req.body.price,
+    flavour: validatedPastry.data.flavour,
+    name: validatedPastry.data.name,
+    price: validatedPastry.data.price,
   };
   pastries.push(newaddedPastry);
   res.json({
@@ -82,17 +95,30 @@ app.post("/pastries",(req,res)=>{
   })
 })
 
+const pastryUpdateSchema = z.object({
+  flavour: z.string().optional(),
+  name: z.string().optional(),
+  price: z.number().optional(),
+});
+
 app.put("/pastries/:id",(req,res)=>{
   const pastryId = parseInt(req.params.id);
   const pastry= pastries.find(b=>b.id === pastryId);
   if(!pastry){
-    return res.status(400).json({
-      message: "Not found",
+    return res.status(404).json({
+      message: "Pastry not found",
     })
   }
-  pastry.flavour= req.body.flavour || pastry.flavour;
-  pastry.name= req.body.name || pastry.name;
-  pastry.price= req.body.price || pastry.price;
+  const validatedUpdate = pastryUpdateSchema.safeParse(req.body);
+  if(!validatedUpdate.success){
+    return res.status(400).json({
+      error: "Invalid update data",
+      details: validatedUpdate.error,
+    });
+  }
+  pastry.flavour= validatedUpdate.data.flavour || pastry.flavour;
+  pastry.name= validatedUpdate.data.name || pastry.name;
+  pastry.price= validatedUpdate.data.price || pastry.price;
   res.json({
     message: "Pastry details updated successfully!"
   });
