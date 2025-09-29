@@ -1,4 +1,5 @@
 import express from "express";
+import {z} from "zod";
 
 const app = express();
 
@@ -14,29 +15,50 @@ interface Pastry {
   id: number;
   flavour: string;
   name: string;
+  price: number;
 }
 
-const pastries: Pastry[] = [
+let pastries: Pastry[] = [
   {
     id: 1,
     flavour: "chocolate",
     name: "chocolate brownie",
+    price: 55,
   },
   {
-    id: 3,
+    id: 2,
     flavour: "vanilla",
     name: "vanilla brownie",
+    price: 50,
   },
   {
     id: 3,
     flavour: "strawberry",
     name: "strawberry cheesecake",
+    price: 45,
   },
 ];
 
+
+const pastrySchema = z.array(
+    z.object({
+      id: z.number(),
+      flavour: z.string(),
+      name: z.string(),
+      price: z.number(),
+    })
+  )
+
+
 app.get("/", (req, res) => {
-  const bakerry = {
-    pastries: "wee",
-  };
-  res.json(bakerry);
+  const validatedPastries = pastrySchema.safeParse(pastries);
+  if(!validatedPastries){
+    return res.status(404).json({
+      error: "The data is not in right format",
+      //details: validatedPastries.error,
+    })
+  }
+  res.json({
+    pastries: validatedPastries.data,
+  });
 });
